@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 
-function App() {
+// Components 
+import Navbar from "./components/navbar";
+import AccountList from "./components/accountList";
+import Create from "./components/create";
+import SignIn from "./components/signin";
+import PenProducts from "./components/penProducts";
+
+export default function App() {
+  const [user, setUser] = useState("");
+  const [token, setToken] = useState("");
+
+  useEffect (() => {
+    const localUser = localStorage.getItem("user");
+    const localToken = localStorage.getItem("token");
+
+    if (localUser && localToken) {
+      setUser(localUser);
+      setToken(localToken);
+    }
+  }, []);
+
+  /*
+  useEffect (() => {
+    // Verify token
+    fetch("http://localhost:5000/verifyToken", {
+      headers: { "x-access-token": localStorage.getItem("token") }
+    })
+    .then(res => res.json())
+    .then(data => data.validToken ? null : localStorage.clear())
+  }, []);*/
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<Navbar user={user}/>}>
+          <Route index element={<AccountList />} />
+          <Route path="pens" element={<PenProducts />} />
+          <Route path="create" element={<Create />} />
+          <Route path="signin" element={<SignIn userState={{user:user, setUser:setUser}} tokenState={{token:token, setToken:setToken}} />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
-
-export default App;
